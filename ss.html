@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+
+html, body
+{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: solid 1px pink;
+}
+.left{
+    width: 150px;
+    height: 100%;
+    border: solid 1px red;
+    float: left;
+}
+.right{
+    overflow: hidden;
+    height: 100%;
+    border: solid 1px green;
+}
+.right-top, .right-bottom{
+    height: 50%;
+    border: solid 1px blue;
+}
+.seat{
+    background: yellow;
+    width: 30px;
+    height: 30px;
+    margin: 3px;
+    text-align: center;
+    float: left;
+}
+.seat.unavailable{
+    background: gray;
+}
+.detailView .order{
+   height:30px;
+   font-size:20;
+}
+.detailView .order.unavailable {
+    display: none;
+}
+.stageView{
+    font-size: 30px;
+}
+.debug {
+    top: 200px;
+    position: absolute;
+    border: dashed 1px pink;
+    background: pink;
+    opacity: .8;
+}
+.debug button{
+    width: 80px;
+    height:60px;
+}
+</style>
+</head>
+
+<body> 
+<div class="left">
+</div>
+<div class="right">
+   <div class="right-top"></div>
+   <div class="right-bottom"></div>
+</div>
+
+<div class="debug">
+    Debug:
+    <br>
+    <button id="refresh"> refresh page (will keep record)</button>
+    <br>
+    <button id="clear"> clear record</button>
+   
+    <!-- <button id="save"> save </button>  
+    <button id="load"> load </button> -->
+</div>
+
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+//######### Class definitions ##################
+//Seat Class
+function Seat(setting){
+  //Private Variables (begin with "var")
+  var defaultValue = {
+      id: 0,
+      name: "",
+      cost: 10,
+      available: true,
+  };
+  var viewTmpl = "<div class='seat'></div>";
+  var _setting = $.extend({}, defaultValue, setting);
+  var self = this;
+  var view;
+    
+  //Private Functions
+  function bindEvent(){
+      view.on("click", function(){
+         view.trigger("seatClick", self);
+      });
+  }
+
+  //Public Functions (begin with "this.")
+  this.info = function(){
+      return _setting;
+  };
+  this.restore = function(info){
+      _setting = $.extend({}, _setting, info);
+      this.render();
+  };
+  this.order = function(){
+      _setting.available = false;
+      this.render();
+  };
+  this.render = function(){
+     if (! view ){
+       //only create renderSeat in the first time render
+       view = $(viewTmpl);
+       bindEvent();
+     }
+     view.html(_setting.name);
+     if(_setting.available === false){
+         view.addClass("unavailable");
+     }
+     return view;
+  };
+}
+
+//Detail Class (Left Area)
+function Detail(seat){
+  var view;
+  var self = this;
+  var viewTmpl ="<div class='detailView'>"+
+                    "<div class='detail'></div>"+
+                    "<button class='order'>Order</button>"+
+                "</div>";
+
+  function bindEvent(){
+      view.find(".order").on("click", function(){
+         seat.order();
+         self.render();
+         view.trigger("orderClick");
+      });
+  }
+  this.render = function(){
+    if (!view ){
+       //only create renderDetail in the first time render
+       view = $(viewTmpl);
+       bindEvent(); 
+    }    
+    var info = seat.info();
+    var infoStr = ["name:" + info.name, 
+                "cost:" + info.cost,
+                "available: " + info.available
+               ].join("<br>");
+     view.find(".detail").html(infoStr);
+     if(info.available === false){
+         view.find(".order").addClass("unavailable");
+     }
+     return view;
+  };
+}
+
+//Stage Class (right Area)
+function Stage(){
+  var view;
+  var self = this;
+  var viewTmpl ="<div>"+
+                    "<div class='stageView'>Stage</div>"+
+                "</div>";
+
+  this.update = function(seat){
+    var info = seat.info();
+    view.find(".stageView").html(info.name + " View");
+  }
+  
+  this.render = function(){
+    if (!view ){
+       view = $(viewTmpl);
+    }  
+    return view;
+  };
+}
+
+//SeatCollection Class
+function SeatCollection(){
+  var seatInfos = {};
+  var seats = {};
+    
+  this.add = function(seat){
+    seats[seat.info().id]=seat;  
+  }
+  
+  this.toJsonStr = function(){
+     $.each(seats, function(id, seat){ 
+        seatInfos[id] = seat.info(); 
+     });    
+     return JSON.stringify(seatInfos);
+  };
+    
+  this.restore = function(jsonStr){
+     try{
+         var json = JSON.parse(jsonStr);
+         $.each(json, function(id, info){  
+             if(seats[id]){
+               seats[id].restore(info);   
+             }
+         });
+      }catch(e){
+      //parse json failed
+      }
+  };
+}
+
+
+//############# Operations ###################
+var rightBottomArea = $(".right-bottom");
+var seatNum = 30;
+var leftArea =  $(".left");
+var rightTopArea =  $(".right-top");
+var seatCollection = new SeatCollection();
+var stage = new Stage();
+
+//append stage to right-top rea
+rightTopArea.append(stage.render());
+
+//init seats
+for(var i=0; i<seatNum; i++){
+    var seatOpt = {
+        name: "s"+i, 
+        id: "sid"+i, 
+        cost: 100-Math.floor(i/4)*10
+    };
+    var seat = new Seat(seatOpt);
+  seatCollection.add(seat);
+  rightBottomArea.append(seat.render());
+}
+
+//seat click handler
+rightBottomArea.on("seatClick", function(e, seat){
+   //create detail and append to left area
+   leftArea.empty().append(new Detail(seat).render());
+   //update stage
+   stage.update(seat);
+});
+
+//order click handler
+leftArea.on("orderClick", function(e, seat){
+   //save to local storage
+   var record = seatCollection.toJsonStr();
+   localStorage.setItem("seats", record);
+});
+
+
+//############# Debug ###################
+$("#clear").click(function(){
+   localStorage.removeItem("seats");
+   window.location.reload();
+});
+
+$("#refresh").click(function(){
+   window.location.reload();
+});
+
+//load seat data from local storage
+(function(){
+   var record = localStorage.getItem("seats");
+   if(record){
+    seatCollection.restore(record);
+    leftArea.empty();
+   }
+}());
+
+/*
+$("#save").click(function(){
+   var record = seatCollection.toJsonStr();
+   localStorage.setItem("seats", record);
+});
+
+$("#load").click(function(){
+   var record = localStorage.getItem("seats");
+   if(record){
+    seatCollection.restore(record);
+    leftArea.empty();
+   }
+});
+*/
+
+
+
+
+</script>
+</body>
+
+</html>
