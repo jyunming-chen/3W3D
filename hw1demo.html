@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+
+
+</style>
+</head>
+
+<body> 
+<h1> Homework 1 (<a href="https://jsfiddle.net/georgeChen/Lpu1trcm/">jsfiddle)</h1>
+</body>
+<div id='light0' style='float:left; width:30%'>
+ light 0
+</div>
+
+<div id='light1' style='float:right; width:30%'>
+ light 1
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+function Lamp(lampId) {
+  var name = '#' + lampId;
+  var status = false;
+
+  var toggle = function() {
+    status = !status;
+    
+    if (status) {
+    	$(name).css ('backgroundColor', 'yellow');
+      $(name).text (name + ' is on');
+    } else {
+    	$(name).css ('backgroundColor', 'rgb(250,230,230)');
+      $(name).text (name + ' is off');
+    }
+  };
+
+  this.check = function() {
+    return status;
+  }
+  
+  this.toggleBlink = function() {
+  	setInterval (function() {toggle();}, 500);
+  }
+}
+
+var l0 = new Lamp('light0');
+l0.toggleBlink();
+
+var l1 = new Lamp('light1');
+l1.toggleBlink();
+
+
+</script>
+</html>

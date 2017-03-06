@@ -32,9 +32,7 @@
 <body>
 <div id="container"></div>
 <div id="info">
-     webgl tutorial 2 <br/>
-	 type <strong>z</strong> to toggle the spin<br/>
-	 (+ window resize)
+     web3D tutorial 0 <br>
 </div>
 <div id="angleInfo"> </div>
 
@@ -118,8 +116,8 @@ function animate() {
 		angle -= dt;
 	}
 	
-	requestAnimationFrame ( animate );  // timer callback
-	render();  // display callback
+	requestAnimationFrame ( animate );  
+	render();  
 	update();
 
 }
@@ -128,7 +126,7 @@ function update() {
 	keyboard.update();
 	controls.update();
 	angleInfoEle.innerHTML = "";
-	// console.log ("angle: " + angle);  print to console
+
 	if ( keyboard.down("Z"))  // yes, must use UPPER CASE
 		toggleTurn();         
 	if (! turn)
