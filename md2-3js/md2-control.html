@@ -89,7 +89,7 @@
 				//  GROUND
 				var texLoader = new THREE.TextureLoader();
 				texLoader.setCrossOrigin ('');
-				var gt = texLoader.load( "https://github.com/mrdoob/three.js/blob/master/examples/textures/terrain/grasslight-big.jpg" );
+				var gt = texLoader.load( "resources/grasslight-big.jpg" );
 				var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 				var ground = new THREE.Mesh( gg, gm );
