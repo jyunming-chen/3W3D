@@ -36,7 +36,7 @@
 
 <body> 
 	<div id="info">
-	  <a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader + MTLLoader
+	  <a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader + MTLLoader + DDSLoader
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
@@ -51,12 +51,15 @@
 	
 <script>
 var camera, scene, renderer;
+var theObject;
 
 var mouseX = 0,
   mouseY = 0;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
+var controls;
+var bs;
 
 
 init();
@@ -68,18 +71,21 @@ function init() {
   container = document.createElement('div');
   document.body.appendChild(container);
 
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 2000);
   camera.position.z = 250;
 
   // scene
 
   scene = new THREE.Scene();
 
+	gridxz = new THREE.GridHelper (200, 20,'red','white');
+	scene.add (gridxz);
+	
   var ambient = new THREE.AmbientLight(0x444444);
   scene.add(ambient);
 
-  var directionalLight = new THREE.DirectionalLight(0xffeedd);
-  directionalLight.position.set(0, 0, 1).normalize();
+  var directionalLight = new THREE.DirectionalLight(0xffffff);
+  directionalLight.position.set(0, 1, 0).normalize();
   scene.add(directionalLight);
 
   // model
@@ -96,18 +102,20 @@ function init() {
   THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
 
   var mtlLoader = new THREE.MTLLoader();
-  mtlLoader.setPath('https://github.com/mrdoob/three.js/tree/master/examples/obj/male02/');
-  mtlLoader.load('male02_dds.mtl', function(materials) {
+  mtlLoader.setPath('resources/');
+	mtlLoader.load('penguin.mtl', function(materials) {
 
     materials.preload();
 
     var objLoader = new THREE.OBJLoader();
     objLoader.setMaterials(materials);
-    objLoader.setPath('https://github.com/mrdoob/three.js/tree/master/examples/obj/male02/');
-    objLoader.load('male02.obj', function(object) {
-
-      object.position.y = -95;
-      scene.add(object);
+    objLoader.setPath('resources/');
+		objLoader.load('penguin.obj', function(object) {
+			
+			var theObject =  unitize (object, 20);
+			scene.add (theObject);
+				
+			scene.add (new THREE.BoxHelper (theObject));
 
     }, onProgress, onError);
 
@@ -119,13 +127,53 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
+	renderer.setClearColor (0x888888);
 
-  document.addEventListener('mousemove', onDocumentMouseMove, false);
-
-  //
-
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	camera.position.z = 200;
+	
   window.addEventListener('resize', onWindowResize, false);
 
+}
+
+////////////////////////////////////////
+// create an Object3D of the given object
+// so that it is centered at +Y axis
+// 
+function unitize (object, targetSize) {  
+	
+	// find bounding box of 'object'
+	var box3 = new THREE.Box3();
+	box3.setFromObject (object);
+	var size = new THREE.Vector3();
+	size.subVectors (box3.max, box3.min);
+	var center = new THREE.Vector3();
+	center.addVectors(box3.max, box3.min).multiplyScalar (0.5);
+	
+	console.log ('center: ' + center.x + ', '+center.y + ', '+center.z );
+	console.log ('size: ' + size.x + ', ' +  size.y + ', '+size.z );
+	
+	// uniform scaling according to objSize
+	var objSize = findMax (size);
+	var scaleSet = targetSize/objSize;
+				
+	var theObject =  new THREE.Object3D();
+	theObject.add (object);
+	object.scale.set (scaleSet, scaleSet, scaleSet);
+	object.position.set (-center.x*scaleSet, -center.y*scaleSet+size.y/2*scaleSet, -center.z*scaleSet);
+	
+	return theObject;
+	
+	
+	// helper function
+	function findMax(v) {
+		if (v.x > v.y) {
+			return v.x > v.z ? v.x : v.z;
+		} else { // v.y > v.x
+			return v.y > v.z ? v.y : v.z;
+		} 
+	}
+			
 }
 
 function onWindowResize() {
@@ -140,16 +188,10 @@ function onWindowResize() {
 
 }
 
-function onDocumentMouseMove(event) {
 
-  mouseX = (event.clientX - windowHalfX) / 2;
-  mouseY = (event.clientY - windowHalfY) / 2;
-
-}
-
-//
 
 function animate() {
+	controls.update();
 
   requestAnimationFrame(animate);
   render();
@@ -157,12 +199,7 @@ function animate() {
 }
 
 function render() {
-
-  camera.position.x += (mouseX - camera.position.x) * .05;
-  camera.position.y += (-mouseY - camera.position.y) * .05;
-
-  camera.lookAt(scene.position);
-
+		
   renderer.render(scene, camera);
 
 }
