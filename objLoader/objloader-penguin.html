@@ -99,8 +99,6 @@ function init() {
 
   var onError = function(xhr) {};
 
-  THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
-
   var mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath('resources/');
 	mtlLoader.load('penguin.mtl', function(materials) {
@@ -154,7 +152,7 @@ function unitize (object, targetSize) {
 	console.log ('size: ' + size.x + ', ' +  size.y + ', '+size.z );
 	
 	// uniform scaling according to objSize
-	var objSize = findMax (size);
+	var objSize = Math.max (size.x, size.y, size.z); 
 	var scaleSet = targetSize/objSize;
 				
 	var theObject =  new THREE.Object3D();
@@ -163,17 +161,7 @@ function unitize (object, targetSize) {
 	object.position.set (-center.x*scaleSet, -center.y*scaleSet+size.y/2*scaleSet, -center.z*scaleSet);
 	
 	return theObject;
-	
-	
-	// helper function
-	function findMax(v) {
-		if (v.x > v.y) {
-			return v.x > v.z ? v.x : v.z;
-		} else { // v.y > v.x
-			return v.y > v.z ? v.y : v.z;
-		} 
-	}
-			
+				
 }
 
 function onWindowResize() {
@@ -191,7 +179,8 @@ function onWindowResize() {
 
 
 function animate() {
-	controls.update();
+  
+  controls.update();
 
   requestAnimationFrame(animate);
   render();
