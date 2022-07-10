@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Big5">
+    <meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+    <meta name="ProgId" content="FrontPage.Editor.Document">
+    <title>Game Programming</title>
+    <style type="text/css">
+<!--
+.emphasis {
+	color: #F00;
+}
+-->
+</style>
+  </head>
+  <body>
+    <p align="center"><b>Web3D技術概論</b></p>
+    <p align="center"><b>Homework 4: </b></p>
+    <p align="center"><b>Node.js, Shelljs, Native Methods</b><br>
+    </p>
+    <p align="center"><b>Due: 5/9/2019</b></p>
+    <div style="align:center;position:absolute; left: 20%; width:70%">
+      <table width="1064" height="462" border="1">
+        <tbody>
+          <tr>
+            <td>
+              <p class="MsoBodyTextIndent" style="line-height: 150%;
+                font-size: 14px;" align="left">技術重點：</p>
+              <ul>
+                <li>2D場景中各有一個 circle 及 rectangle.</li>
+                <li>circle: 起始於random position, 以random
+                  velocity與四面牆做彈性碰撞</li>
+                <li>circle的半徑可以由外部range element設定</li>
+                <li>rectangle: 固定而適當的大小，可以由滑鼠按左鍵設定位置</li>
+                <li>circle-rectangle intersection: 採用<a
+href="http://www.realtimerendering.com/resources/GraphicsGems/gems/CircleRect.c">Graphics
+                    Gems I 中的演算法</a>，以C在server上實作成EXE.</li>
+                <li>在每個animation frame,
+                  將circle及rectangle適當的參數，透過node.js，傳入server上的EXE,
+                  再將結果以response傳回client</li>
+                <li>若碰撞有發生，改變circle的顏色，並觸發音效（若GUI上的checkbutton為on時）</li>
+              </ul>
+              繳交：<br>
+              將作業上傳至github repository<br>
+              並將操作過程以gif錄下，放在index.html (要包含足夠detail, 但不要太長)<br>
+            </td>
+            <td><img src="hw4.png" width="563" height="375"></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="MsoBodyTextIndent" style="line-height: 150%"
+        align="left">&nbsp;</p>
+      <p class="MsoBodyTextIndent" style="line-height: 150%"
+        align="left">&nbsp;</p>
+    </div>
+    <p class="MsoBodyTextIndent" style="line-height: 150%">&nbsp;</p>
+    <p class="MsoBodyTextIndent" style="line-height: 150%">&nbsp;</p>
+    <p class="MsoBodyTextIndent" style="line-height: 150%">&nbsp;</p>
+  </body>
+</html>

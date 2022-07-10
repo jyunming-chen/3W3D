@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+#info {
+  position: absolute;
+  top: 2%;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+</style>
+</head>
+
+<body> 
+<h1>
+Integration Guide
+</h1>
+<hr>
+<div id="container" style="float:left;background:pink; width:60vw; height:60vw">
+</div>
+<div id='gui' style="width:35vw; float:right; height:60vw; background:yellow">
+	<button id="toggle" style="width:50%">Toggle Turn</button>
+	<br><br>Angle
+	<input type='text' id='anglePrint'>
+</div>
+
+<!--
+---------------------------------------------------------------------
+-->
+
+<!--div id="info">My Second Three.js
+  <br/> turning, buttons, orbitControls, resize
+  <button id="toggle" style="width:20%">Toggle Turn</button>
+</div-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var scene, renderer, camera;
+var controls;
+var mesh, angle = 0,
+  turn = false;
+
+init();
+animate();
+
+$("#toggle").click(function() {
+  turn = !turn;
+});
+
+function init() {
+
+  var width = $('#container').innerWidth();
+  var height = $('#container').innerHeight();
+    
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(width, height);
+  renderer.setClearColor(0x888888);
+  $('#container').append (renderer.domElement);
+
+  scene = new THREE.Scene();
+  
+  camera = new THREE.PerspectiveCamera(50, width / height, 1, 1000);
+  camera.position.z = 500;
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  var geometry = new THREE.BoxGeometry(100, 20, 20);
+  var material = new THREE.MeshBasicMaterial({
+    wireframe: true
+  });
+
+  mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  var gridXZ = new THREE.GridHelper(100, 10, 'red', 'white');
+  scene.add(gridXZ);
+
+  window.addEventListener('resize', onWindowResize, false);
+
+}
+
+function onWindowResize() {
+  var width = $('#container').innerWidth();
+  var height = $('#container').innerHeight();
+
+  camera.aspect = width/height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+}
+
+function animate() {
+  controls.update();
+  if (turn)
+    angle += 0.01;
+  mesh.rotation.y = angle;
+  
+  $('#anglePrint').val( angle );
+
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+
+
+</script>
+</body>
+
+</html>

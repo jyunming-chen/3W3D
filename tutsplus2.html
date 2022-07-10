@@ -36,7 +36,7 @@
 </div>
 <div id="angleInfo"> </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
+<script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
@@ -46,7 +46,7 @@
 var clock = new THREE.Clock();
 var scene, renderer, camera;
 var cube;
-var controls, keyboard = new KeyboardState();
+var keyboard = new KeyboardState();
 var angle = 0;
 var turn = true;
 
@@ -84,10 +84,10 @@ function init() {
 	camera.position.z = 400;
 	camera.lookAt (new THREE.Vector3(0,0,0));
 
-	controls = new THREE.OrbitControls (camera, render.domElement);
+	let controls = new THREE.OrbitControls (camera, renderer.domElement);
 
 
-	var gridXZ = new THREE.GridHelper(100, 10, 'red', 'white');
+	var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
 	scene.add(gridXZ);
 
 	var pointLight = new THREE.PointLight (0xffffff);
@@ -124,13 +124,12 @@ function animate() {
 
 function update() {
 	keyboard.update();
-	controls.update();
 	angleInfoEle.innerHTML = "";
 
 	if ( keyboard.down("Z"))  // yes, must use UPPER CASE
 		toggleTurn();         
 	if (! turn)
-		angleInfoEle.innerHTML = angle;
+		angleInfoEle.innerHTML = angle.toFixed(2);
 
 }
 
