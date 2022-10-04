@@ -10,49 +10,64 @@
 </head>
 
 <body> 
-<h1> Homework 1 (<a href="https://jsfiddle.net/georgeChen/Lpu1trcm/">jsfiddle)</h1>
-</body>
-<div id='light0' style='float:left; width:30%'>
- light 0
-</div>
+<h1> Hw1 Helper</h1>
 
-<div id='light1' style='float:right; width:30%'>
- light 1
-</div>
+<div id='bkgd' style="position:absolute; top: 10vh; left: 10vw; width:60vw; height: 60vh; background-Color: pink"></div>
 
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
 <script>
-function Lamp(lampId) {
-  var name = '#' + lampId;
-  var status = false;
+class Lamp {
 
-  var toggle = function() {
-    status = !status;
+  constructor(name) {
+    this.name = name + Lamp.id++;
+    this.myStatus = false;
     
-    if (status) {
-    	$(name).css ('backgroundColor', 'yellow');
-      $(name).text (name + ' is on');
-    } else {
-    	$(name).css ('backgroundColor', 'rgb(250,230,230)');
-      $(name).text (name + ' is off');
-    }
-  };
+    let el = document.createElement ('div');
+    el.id = this.name;
+    let text = document.createTextNode (name + ' is OFF');
+    el.appendChild(text);
+    let bkgd = document.getElementById('bkgd');
+    bkgd.appendChild(el);
+    this.hue = Math.random()*360;
 
-  this.check = function() {
-    return status;
+    // styles
+    el.setAttribute ("style", `background-color: hsl(${this.hue}, 90%, 50%); width:10%`);
+    this.left = Math.random()*0.8;
+    this.top = Math.random()*0.8;
+    el.style.position = "absolute";
+    el.style.left = this.left*100 + '%'; 
+    el.style.top = this.top*100 + '%';
   }
-  
-  this.toggleBlink = function() {
-  	setInterval (function() {toggle();}, 500);
+
+  toggle() {
+    this.myStatus = ! this.myStatus;
+    if (this.myStatus === true) {
+      $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,80%)`);
+      $('#'+this.name).text(this.name + ' is on');
+    } else {
+      $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,24%)`);
+      $('#'+this.name).text(this.name + ' is off');
+    }
+  }
+
+  startBlink() {
+    var that = this;
+    setInterval(function() {
+      that.toggle();
+    }, 500);
   }
 }
 
-var l0 = new Lamp('light0');
-l0.toggleBlink();
 
-var l1 = new Lamp('light1');
-l1.toggleBlink();
+Lamp.id = 0; // class variable
+for (let i = 0; i < 3; i++) {
+   let ll = new Lamp ('light');
+   ll.startBlink();
+}
 
 
 </script>
+</body>
+
 </html>
