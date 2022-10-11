@@ -11,12 +11,22 @@
 
 <body> 
 <h1> Hw1 Helper</h1>
-
+<button id='power'>Power</button>
 <div id='bkgd' style="position:absolute; top: 10vh; left: 10vw; width:60vw; height: 60vh; background-Color: pink"></div>
 
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 
 <script>
+var powerOn = true;
+
+$('#power').click (function() {
+  powerOn = !powerOn;
+  
+  if (powerOn === true) {  // false--> true
+     lamps.forEach (function(item) {item.startBlink();});
+  }
+});
+
 class Lamp {
 
   constructor(name) {
@@ -42,6 +52,11 @@ class Lamp {
 
   toggle() {
     this.myStatus = ! this.myStatus;
+    
+    if (powerOn) {
+       setTimeout (()=>{this.toggle();}, 500);
+    }
+    
     if (this.myStatus === true) {
       $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,80%)`);
       $('#'+this.name).text(this.name + ' is on');
@@ -53,19 +68,27 @@ class Lamp {
 
   startBlink() {
     var that = this;
+/*   
     setInterval(function() {
       that.toggle();
     }, 500);
+*/
+   setTimeout (()=>{ this.toggle(); }, 0);
+     
+    //setInterval (that.toggle, 500);   // somehow, it does not work
   }
 }
 
 
 Lamp.id = 0; // class variable
+lamps = [];
+
 for (let i = 0; i < 3; i++) {
    let ll = new Lamp ('light');
-   ll.startBlink();
+   lamps.push (ll);
 }
 
+lamps.forEach ( function(ll) {ll.startBlink();} );
 
 </script>
 </body>
